@@ -21,12 +21,6 @@ impl Rectangle {
     }
 }
 
-enum Option<T> {
-    None,
-    Some(T),
-    Anyval
-}
-
 fn main() {
     let rect1 = Rectangle::square(5);
     println!("area: {}", rect1.area());
@@ -44,6 +38,16 @@ fn main() {
         3 => dice::add_fancy_hat(),
         7 => dice::remove_fancy_hat(),
         _ => (),
+    }
+
+    let v2: Vec<i32> = Vec::new();
+    let mut v: Vec<i32> = vec![0,1,2,3];
+    for i in &mut v {
+        *i *= 10;
+        println!("i: {i}");
+    }
+    for i in &mut v {
+        println!("i: {i}");
     }
 }
 
