@@ -1,7 +1,7 @@
 mod mods;
 mod dice;
 
-use mods::{ip, coin};
+use mods::{ip, coin, sub_mod};
 
 struct Rectangle {
     width: u32,
@@ -49,5 +49,7 @@ fn main() {
     for i in &mut v {
         println!("i: {i}");
     }
+
+    sub_mod::test::tfunc();
 }
 
