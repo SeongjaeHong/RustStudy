@@ -4,6 +4,9 @@ mod dice;
 use mods::{ip, coin, sub_mod};
 use sub_mod::test;
 
+use std::fs::File;
+use std::io::{self, Read};
+
 struct Rectangle {
     width: u32,
     height: u32,
@@ -23,34 +26,27 @@ impl Rectangle {
 }
 
 fn main() {
-    let rect1 = Rectangle::square(5);
-    println!("area: {}", rect1.area());
-
-    let home = ip::IpAddr::V4(String::from("127.0.0.1"));
-    let company = ip::IpAddr::V6(String::from("I don't know"));
-
-    println!("Cents: {}", coin::value_in_cents(coin::Coin::Nickel));
-
-    let dice_roll = 3;
-    if let 3 = dice_roll {
-        dice::add_fancy_hat();
-    }
-    match dice_roll {
-        3 => dice::add_fancy_hat(),
-        7 => dice::remove_fancy_hat(),
-        _ => (),
-    }
-
-    let v2: Vec<i32> = Vec::new();
-    let mut v: Vec<i32> = vec![0,1,2,3];
-    for i in &mut v {
-        *i *= 10;
-        println!("i: {i}");
-    }
-    for i in &mut v {
-        println!("i: {i}");
-    }
-
-    test::tfunc();
+    
+    println!("Lets' go\n");
+    let x = err_func();
+    println!("{:?}", x);
 }
 
+fn err_func() -> Result<String, io::Error> {
+    let mut s = String::new();
+    File::open("error_file")?.read_to_string(&mut s)?;
+    return Ok(s);
+    // let f = File::open("error_file");
+    // let mut f = match f {
+    //     Ok(f) => f,
+    //     Err(e12) => return Err(e12)
+    // };
+
+    // let mut s = String::new();
+    // match f.read_to_string(&mut s) {
+    //     Ok(_) => Ok(s),
+    //     Err(e) => Err(e)
+    // }
+    // f.read_to_string(&mut s)?;
+    // Ok(s)
+}
