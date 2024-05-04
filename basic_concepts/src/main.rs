@@ -61,9 +61,12 @@ fn main() {
     println!("The largest number is {}", result);
 
     let chars = vec!['y', 'm', 'a', 'q'];
-
     let result = largest(&chars);
     println!("The largest char is {}", result);
+
+    let s1 = "asd";
+    let s2 = "sdlfasdf";
+    println!("Longest one is {}", largest_lifetime(s1, s2));
 }
 fn largest<T: PartialOrd>(list:&[T]) -> &T {
     let mut max_num: &T = &list[0];
@@ -74,6 +77,16 @@ fn largest<T: PartialOrd>(list:&[T]) -> &T {
     }
     max_num
 }
+
+fn largest_lifetime<'a>(x: &'a str, y: &'a str) -> &'a str{
+    if x.len() > y.len() {
+        x
+    }
+    else {
+        y
+    }
+}
+
 fn err_func() -> Result<String, io::Error> {
     let mut s = String::new();
     File::open("error_file")?.read_to_string(&mut s)?;
