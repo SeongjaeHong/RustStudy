@@ -1,11 +1,11 @@
+use hello::ThreadPool;
 use std::{
     fs,
     io::{prelude::*, BufReader},
     net::{TcpListener, TcpStream},
     thread,
-    time::Duration
+    time::Duration,
 };
-use hello::ThreadPool;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
@@ -31,7 +31,7 @@ fn handle_conntection(mut stream: TcpStream) {
             thread::sleep(Duration::from_secs(5));
             ("HTTP/1.1 200 OK", "./pages/hello.html")
         }
-        _ => ("HTTP/1.1 404 NOT FOUND", "./pages/404.html")
+        _ => ("HTTP/1.1 404 NOT FOUND", "./pages/404.html"),
     };
 
     let contents = fs::read_to_string(file_path).unwrap();

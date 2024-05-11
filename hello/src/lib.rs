@@ -1,19 +1,19 @@
 use std::{
     sync::{mpsc, Arc, Mutex},
-    thread::{self, Thread}
+    thread,
 };
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
 pub struct ThreadPool {
     workers: Vec<Worker>,
-    sender: Option<mpsc::Sender<Job>>
+    sender: Option<mpsc::Sender<Job>>,
 }
 
 impl ThreadPool {
     /// Create a new ThreadPool.
-    /// 
+    ///
     /// The size is the number of threads in the pool.
-    /// 
+    ///
     /// # Panics
     /// The `new` function will panic if the size is zero.
     pub fn new(size: usize) -> ThreadPool {
@@ -21,18 +21,21 @@ impl ThreadPool {
 
         let (sender, receiver) = mpsc::channel();
         let receiver = Arc::new(Mutex::new(receiver));
-        
+
         let mut workers = Vec::with_capacity(size);
         for id in 0..size {
             workers.push(Worker::new(id, Arc::clone(&receiver)));
         }
 
-        ThreadPool { workers, sender: Some(sender) }
+        ThreadPool {
+            workers,
+            sender: Some(sender),
+        }
     }
 
-    pub fn execute<F>(&self, f: F) 
+    pub fn execute<F>(&self, f: F)
     where
-        F: FnOnce() + Send + 'static
+        F: FnOnce() + Send + 'static,
     {
         let job = Box::new(f);
         self.sender.as_ref().unwrap().send(job).unwrap();
@@ -41,7 +44,7 @@ impl ThreadPool {
 
 struct Worker {
     id: usize,
-    thread: Option<thread::JoinHandle<()>>
+    thread: Option<thread::JoinHandle<()>>,
 }
 
 impl Worker {
@@ -62,7 +65,10 @@ impl Worker {
             }
         });
 
-        Worker {id, thread: Some(thread)}
+        Worker {
+            id,
+            thread: Some(thread),
+        }
     }
 }
 
@@ -71,7 +77,7 @@ impl Drop for ThreadPool {
         drop(self.sender.take());
         for worker in &mut self.workers {
             println!("Shutting down worker {}", worker.id);
-            
+
             if let Some(thread) = worker.thread.take() {
                 thread.join().unwrap();
             }
