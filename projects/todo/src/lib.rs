@@ -1,5 +1,9 @@
 use std::{
-    collections::HashMap, fmt, fs, io::Write, os::unix::fs::PermissionsExt, path::PathBuf,
+    collections::HashMap,
+    fmt, fs,
+    io::{self, Write},
+    os::unix::fs::PermissionsExt,
+    path::PathBuf,
     process::exit,
 };
 
@@ -11,15 +15,15 @@ pub enum Action {
 }
 
 impl Action {
-    pub fn run(&self, item: &str) {
+    pub fn run(&self, todo_table: &HashMap<usize, Todo>, item: &str) {
         match self {
-            Action::Add => self.add(item),
-            Action::Remove => self.remove(item),
-            Action::Done => self.done(item),
+            Action::Add => self.add(todo_table, item),
+            Action::Remove => self.remove(todo_table, item),
+            Action::Done => self.done(todo_table, item),
         }
     }
     // TODO: Write on the first line if the file is empty. Currently, it writes from the second line.
-    fn add(&self, item: &str) {
+    fn add(&self, todo_table: &HashMap<usize, Todo>, item: &str) {
         let mut file = fs::OpenOptions::new()
             .append(true)
             .open(DEFAULT_PATH)
@@ -30,10 +34,10 @@ impl Action {
         }
     }
     // TODO: Remove jobs only with indexes.
-    fn remove(&self, item: &str) {}
+    fn remove(&self, todo_table: &HashMap<usize, Todo>, item: &str) {}
 
     // TODO: Finish jobs only with indexes.
-    fn done(&self, item: &str) {}
+    fn done(&self, todo_table: &HashMap<usize, Todo>, item: &str) {}
 }
 
 pub struct Todo {
@@ -55,12 +59,13 @@ impl fmt::Display for TodoState {
     }
 }
 
-const DEFAULT_PATH: &str = ".todo/todo_list.txt";
+pub const DEFAULT_PATH: &str = ".todo/todo_list.txt";
 
-pub fn create_default_todo(default_path: &PathBuf) {
+fn create_default_todo() {
     // Create default todo list.
     //
     // Permission of the todo list is 666.
+    let default_path = PathBuf::from(DEFAULT_PATH);
     if let Some(_) = &default_path.parent() {
         if let Err(e) = fs::create_dir_all(&default_path.parent().unwrap()) {
             eprintln!("[Error]: {}", e);
@@ -83,16 +88,13 @@ pub fn create_default_todo(default_path: &PathBuf) {
     println!("Create todo list!");
 }
 
-pub fn read_todo() -> Result<(), std::io::Error> {
+pub fn create_todo_table() -> Result<HashMap<usize, Todo>, io::Error> {
     let default_path = PathBuf::from(DEFAULT_PATH);
 
     if let Ok(exists) = default_path.try_exists() {
         if !exists {
-            create_default_todo(&default_path);
+            create_default_todo();
         }
-    } else {
-        eprintln!("Can't check whether the todo list exists.");
-        exit(1);
     }
 
     let file = fs::read_to_string(&default_path)?;
@@ -112,13 +114,20 @@ pub fn read_todo() -> Result<(), std::io::Error> {
         }
     }
 
-    if todos.len() == 0 {
+    return Ok(todos);
+}
+
+pub fn read_todo(todo_table: HashMap<usize, Todo>) {
+    if todo_table.len() == 0 {
         println!("There is not any job todo.")
     } else {
-        for todo in todos {
-            println!("{}: {} ({})", todo.0, todo.1.todo, todo.1.state);
+        for idx in 1..todo_table.len() + 1 {
+            println!(
+                "{}: {} ({})",
+                idx,
+                todo_table.get(&idx).unwrap().todo,
+                todo_table.get(&idx).unwrap().state,
+            );
         }
     }
-
-    Ok(())
 }
