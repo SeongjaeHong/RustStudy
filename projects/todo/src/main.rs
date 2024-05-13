@@ -37,6 +37,6 @@ fn main() {
 
     for _ in 0..args.len() {
         let new_job = args.next().unwrap();
-        action.run(&todo_table, &new_job[..]);
+        action.run(&mut todo_table, &new_job[..]);
     }
 }

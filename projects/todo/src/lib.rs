@@ -15,7 +15,7 @@ pub enum Action {
 }
 
 impl Action {
-    pub fn run(&self, todo_table: &HashMap<usize, Todo>, item: &str) {
+    pub fn run(&self, todo_table: &mut HashMap<usize, Todo>, item: &str) {
         match self {
             Action::Add => self.add(todo_table, item),
             Action::Remove => self.remove(todo_table, item),
@@ -23,7 +23,7 @@ impl Action {
         }
     }
     // TODO: Write on the first line if the file is empty. Currently, it writes from the second line.
-    fn add(&self, todo_table: &HashMap<usize, Todo>, item: &str) {
+    fn add(&self, todo_table: &mut HashMap<usize, Todo>, item: &str) {
         let mut file = fs::OpenOptions::new()
             .append(true)
             .open(DEFAULT_PATH)
@@ -32,6 +32,14 @@ impl Action {
         if let Err(e) = writeln!(file, "{item}") {
             eprintln!("Couldn't write to file: {}", e);
         }
+
+        todo_table.insert(
+            todo_table.len() + 1,
+            Todo {
+                todo: String::from(item),
+                state: TodoState::NotYet,
+            },
+        );
     }
     // TODO: Remove jobs only with indexes.
     fn remove(&self, todo_table: &HashMap<usize, Todo>, item: &str) {}
@@ -41,8 +49,8 @@ impl Action {
 }
 
 pub struct Todo {
-    todo: String,
-    state: TodoState,
+    pub todo: String,
+    pub state: TodoState,
 }
 
 enum TodoState {
