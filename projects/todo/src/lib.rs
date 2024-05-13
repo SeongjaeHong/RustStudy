@@ -29,7 +29,10 @@ impl Action {
             eprintln!("Couldn't write to file: {}", e);
         }
     }
+    // TODO: Remove jobs only with indexes.
     fn remove(&self, item: &str) {}
+
+    // TODO: Finish jobs only with indexes.
     fn done(&self, item: &str) {}
 }
 

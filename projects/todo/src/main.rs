@@ -14,6 +14,7 @@ fn main() {
         });
         exit(1);
     }
+
     let action = action.unwrap().to_lowercase();
     let action = match &action[..] {
         "add" => Action::Add,
@@ -25,8 +26,7 @@ fn main() {
         }
     };
 
-    let new_job = args.next();
-    if let None = new_job {
+    if args.len() == 0 {
         let err_msg = match action {
             Action::Add => "Input a new job to add.\n",
             Action::Remove => "Input a job name or a number of a job to remove.\n",
@@ -36,6 +36,8 @@ fn main() {
         exit(1);
     }
 
-    let new_job: String = new_job.unwrap();
-    action.run(&new_job[..]);
+    for _ in 0..args.len() {
+        let new_job = args.next().unwrap();
+        action.run(&new_job[..]);
+    }
 }
