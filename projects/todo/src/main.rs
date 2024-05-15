@@ -1,5 +1,5 @@
 use std::{env, process::exit};
-use todo::{create_todo_table, read_todo, Action};
+use todo::{create_todo_table, read_todo, update_file, Action};
 
 fn main() {
     let mut todo_table = create_todo_table().unwrap();
@@ -9,8 +9,8 @@ fn main() {
     let action = args.next();
 
     // If the action is empty, read todo list.
-    if let None = action {
-        read_todo(todo_table);
+    if action.is_none() {
+        read_todo(&todo_table);
         exit(1);
     }
 
@@ -20,7 +20,7 @@ fn main() {
         "remove" => Action::Remove,
         "done" => Action::Done,
         _ => {
-            eprint!("Wrong action type is given. Choose between [Add, Remove, Done]\n");
+            eprintln!("Wrong action type is given. Choose between [Add, Remove, Done]");
             exit(1);
         }
     };
@@ -35,8 +35,18 @@ fn main() {
         exit(1);
     }
 
-    for _ in 0..args.len() {
-        let new_job = args.next().unwrap();
-        action.run(&mut todo_table, &new_job[..]);
+    let jobs: Vec<String> = match action {
+        Action::Add => args.collect(),
+        _ => {
+            let mut jobs: Vec<_> = args.collect();
+            jobs.sort();
+            jobs.reverse();
+            jobs
+        }
+    };
+
+    for job in jobs {
+        action.run(&mut todo_table, &job);
     }
+    update_file(&todo_table);
 }
